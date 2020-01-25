@@ -8,6 +8,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import br.example.agenda.db.ContatoRepository
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -21,13 +22,6 @@ class MainActivity : AppCompatActivity() {
         myToolbar.setTitleTextColor(Color.WHITE)
         setSupportActionBar(myToolbar)
 
-
-        val contatos = arrayOf("Maria", "José", "Carlos")
-        val adapter
-                = ArrayAdapter(this, android.R.layout.simple_list_item_1, contatos)
-
-        var listaContatos = lista
-        listaContatos.setAdapter(adapter);
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -62,6 +56,21 @@ class MainActivity : AppCompatActivity() {
             else -> return super.onOptionsItemSelected(item)
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        val contatos = ContatoRepository(this).findAll()
+        val adapter= ArrayAdapter(this, android.R.layout.simple_list_item_1, contatos)
+        lista?.adapter = adapter
+        adapter.notifyDataSetChanged()
+
+        lista.setOnItemClickListener { _, _, position, id ->
+            val intent = Intent(this, ContatoActivity::class.java)
+            intent.putExtra("contato", contatos?.get(position))
+            startActivity(intent)
+        }
+    }
+
 
 
 
